@@ -1,0 +1,7 @@
+{
+  "provider": {
+    "baseURL": "https://your-openai-compatible-endpoint/v1",
+    "apiKey": "your-api-key",
+    "model": "your-model-name"
+  }
+}

@@ -1,0 +1,17 @@
+node_modules/
+.frontend-compass/
+dist/
+build/
+coverage/
+*.log
+*.tmp
+*.cache
+
+# local config with secrets
+frontend-compass.config.json
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
