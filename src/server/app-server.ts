@@ -689,6 +689,41 @@ export function buildAppShellHtml(input: { projectRoot: string }) {
         color: #496658;
         font-weight: 700;
       }
+      .ai-summary {
+        margin-top: 12px;
+        border: 1px solid #c7d7ce;
+        background: #f7fbf8;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .ai-summary[hidden] {
+        display: none;
+      }
+      .ai-summary-title {
+        margin: 0 0 6px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2a5b44;
+        font-weight: 700;
+      }
+      .ai-summary-headline {
+        margin: 0 0 4px;
+        font-size: 15px;
+        color: #173c2c;
+        font-weight: 700;
+      }
+      .ai-summary-description {
+        margin: 0;
+        font-size: 13px;
+        color: #3d5d4f;
+      }
+      .ai-summary-list {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #335645;
+        font-size: 13px;
+      }
       .action-button {
         border: 1px solid #1d7f55;
         background: linear-gradient(180deg, #2aa36f 0%, #208d60 100%);
@@ -1018,6 +1053,12 @@ export function buildAppShellHtml(input: { projectRoot: string }) {
           <button id="start-analysis-button" class="action-button" type="button">Start Analysis</button>
           <button id="refresh-button" class="action-button" type="button">Refresh Analysis</button>
         </div>
+        <section id="ai-summary" class="ai-summary" hidden>
+          <h3 class="ai-summary-title">AI Summary</h3>
+          <p id="ai-summary-headline" class="ai-summary-headline"></p>
+          <p id="ai-summary-description" class="ai-summary-description"></p>
+          <ul id="ai-summary-list" class="ai-summary-list"></ul>
+        </section>
         <section class="page-graph-layout">
           <div class="graph-panel graph-panel-main">
             <h2>Global Page Graph</h2>
@@ -1449,6 +1490,10 @@ export function buildAppShellHtml(input: { projectRoot: string }) {
         const metaCache = document.getElementById('meta-cache');
         const granularitySelect = document.getElementById('analysis-granularity');
         const refreshButton = document.getElementById('refresh-button');
+        const aiSummary = document.getElementById('ai-summary');
+        const aiHeadline = document.getElementById('ai-summary-headline');
+        const aiDescription = document.getElementById('ai-summary-description');
+        const aiList = document.getElementById('ai-summary-list');
 
         if (metaFramework) {
           metaFramework.textContent = 'Framework: ' + overview.framework;
@@ -1462,6 +1507,20 @@ export function buildAppShellHtml(input: { projectRoot: string }) {
         }
         if (refreshButton) {
           refreshButton.removeAttribute('disabled');
+        }
+        const mode = meta.analysisGranularity || 'local';
+        if (aiSummary) {
+          aiSummary.hidden = mode !== 'file';
+        }
+        if (mode === 'file' && overview && aiHeadline && aiDescription && aiList) {
+          aiHeadline.textContent = overview.summary?.title || 'File-level summary';
+          aiDescription.textContent = overview.summary?.description || '';
+          const points = Array.isArray(overview.summary?.highlights) ? overview.summary.highlights : [];
+          aiList.innerHTML = points.map((item) => '<li>' + escapeHtml(item) + '</li>').join('');
+        } else if (aiHeadline && aiDescription && aiList) {
+          aiHeadline.textContent = '';
+          aiDescription.textContent = '';
+          aiList.innerHTML = '';
         }
 
       }
@@ -1481,6 +1540,7 @@ export function buildAppShellHtml(input: { projectRoot: string }) {
         const detailList = document.getElementById('page-detail-list');
         const granularitySelect = document.getElementById('analysis-granularity');
         const refreshButton = document.getElementById('refresh-button');
+        const aiSummary = document.getElementById('ai-summary');
         if (metaFramework) {
           metaFramework.textContent = 'Framework: -';
         }
@@ -1504,6 +1564,9 @@ export function buildAppShellHtml(input: { projectRoot: string }) {
         }
         if (refreshButton) {
           refreshButton.setAttribute('disabled', 'true');
+        }
+        if (aiSummary) {
+          aiSummary.hidden = true;
         }
         surfaceState.analysisStarted = false;
       }
